@@ -1,0 +1,10 @@
+[
+  {
+    "name": "auth-access-token",
+    "value": "YOUR_ACCESS_TOKEN_HERE"
+  },
+  {
+    "name": "auth-refresh-token",
+    "value": "YOUR_REFRESH_TOKEN_HERE"
+  }
+]
