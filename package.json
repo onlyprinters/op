@@ -6,7 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop op",
+    "pm2:restart": "pm2 restart op",
+    "pm2:delete": "pm2 delete op",
+    "pm2:logs": "pm2 logs op",
+    "pm2:monit": "pm2 monit"
   },
   "dependencies": {
     "@solana/spl-token": "^0.4.14",
