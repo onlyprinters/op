@@ -3,6 +3,20 @@ import connectDB from '@/lib/mongodb';
 import Draw from '@/models/Draw';
 import { getCurrentSeasonId } from '@/lib/seasonUtils';
 
+interface DrawDocument {
+  drawId: string;
+  drawTime: Date;
+  participants: unknown[];
+  winnerId: { toString: () => string };
+  winnerWallet: string;
+  winnerName: string;
+  winnerRank: number;
+  prizeAmount: number;
+  totalPoolAtDraw: number;
+  txSignature: string;
+  txUrl: string;
+}
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -24,7 +38,7 @@ export async function GET(request: NextRequest) {
       .lean();
 
     // Format response
-    const formattedDraws = draws.map((draw: any) => ({
+    const formattedDraws = draws.map((draw: DrawDocument) => ({
       drawId: draw.drawId,
       drawTime: draw.drawTime,
       participants: draw.participants,
