@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Insufficient $OP tokens. Required: ${OP_TOKEN_REQUIRED.toLocaleString()}, Your balance: ${balance.toLocaleString()}`,
+          error: `Insufficient $PRINT tokens. Required: ${OP_TOKEN_REQUIRED.toLocaleString()}, Your balance: ${balance.toLocaleString()}`,
           data: {
             required: OP_TOKEN_REQUIRED,
             balance: balance,

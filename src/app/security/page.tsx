@@ -156,7 +156,7 @@ wallet.sendTransaction();      // ❌ Never used`}
             <span>📁</span>
             <span>See full code: </span>
             <a
-              href="https://github.com/your-repo/src/contexts/WalletContext.tsx"
+              href="https://github.com/onlyprinters/op/src/contexts/WalletContext.tsx"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-400 hover:text-blue-300 underline"

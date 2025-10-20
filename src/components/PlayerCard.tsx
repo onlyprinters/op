@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 
 interface PlayerCardProps {
   name: string;
   avatar: string;
+  wallet: string;
   tokenBalance: number;
   
   // Balance
@@ -40,11 +42,15 @@ interface PlayerCardProps {
     between0AndNeg50Percent: number;
     underNeg50Percent: number;
   };
+  
+  // Callback to refresh data after recalculation
+  onStatsUpdated?: () => void;
 }
 
 export default function PlayerCard({
   name,
   avatar,
+  wallet,
   tokenBalance = 0,
   availableBalanceSol = 0,
   totalPnl = 0,
@@ -60,8 +66,49 @@ export default function PlayerCard({
   solBought = 0,
   solSold = 0,
   pnlBreakdown,
+  onStatsUpdated,
 }: PlayerCardProps) {
   const isProfitable = totalPnl >= 0;
+  const [isRecalculating, setIsRecalculating] = useState(false);
+  const [recalcMessage, setRecalcMessage] = useState<string | null>(null);
+
+  const handleRecalculate = async () => {
+    setIsRecalculating(true);
+    setRecalcMessage(null);
+
+    try {
+      const response = await fetch('/api/daily-traders/recalculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ wallet }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setRecalcMessage('✅ Stats updated successfully!');
+        // Call parent callback to refresh PlayerCard data
+        if (onStatsUpdated) {
+          onStatsUpdated();
+        }
+        // Trigger leaderboard refresh
+        window.dispatchEvent(new Event('refreshLeaderboard'));
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setRecalcMessage(null);
+        }, 3000);
+      } else {
+        setRecalcMessage(data.error || '❌ Failed to recalculate');
+      }
+    } catch (error) {
+      console.error('Recalculation error:', error);
+      setRecalcMessage('❌ Network error. Please try again.');
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-green-200">
@@ -86,7 +133,7 @@ export default function PlayerCard({
         
         {/* Token Balance */}
         <p className="text-sm text-gray-600 mb-4">
-          {tokenBalance.toLocaleString()} $OP
+          {tokenBalance.toLocaleString()} $PRINT
         </p>
 
         {/* Total PNL (24h) */}
@@ -239,8 +286,44 @@ export default function PlayerCard({
           )}
         </div>
 
-        {/* Status Badge */}
+        {/* Recalculate Button */}
         <div className="mt-4 pt-4 border-t border-gray-200">
+          <button
+            onClick={handleRecalculate}
+            disabled={isRecalculating}
+            className={`w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all ${
+              isRecalculating
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-lg'
+            }`}
+          >
+            {isRecalculating ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Updating...
+              </span>
+            ) : (
+              <>🔄 Recalculate Stats</>
+            )}
+          </button>
+          
+          {/* Message Display */}
+          {recalcMessage && (
+            <div className={`mt-2 p-2 rounded text-xs text-center ${
+              recalcMessage.startsWith('✅') 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800'
+            }`}>
+              {recalcMessage}
+            </div>
+          )}
+        </div>
+
+        {/* Status Badge */}
+        <div className="mt-2">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">
             <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
             Active Today

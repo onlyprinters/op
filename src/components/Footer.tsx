@@ -26,7 +26,7 @@ export default function Footer() {
           {/* Motivational Tagline */}
           <div className="hidden sm:block">
             <p className="text-gray-600 font-medium">
-              💎 Only Winners Print Money
+              💎 Survive, print, repeat
             </p>
           </div>
 

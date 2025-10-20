@@ -267,6 +267,7 @@ export default function Sidebar() {
     return (
       <aside className="w-full">
         <PlayerCard
+          wallet={user.walletOriginal}
           name={user.name}
           avatar={user.avatar}
           tokenBalance={dailyTraderData.tokenBalance}
@@ -284,6 +285,7 @@ export default function Sidebar() {
           solBought={dailyTraderData.solBought}
           solSold={dailyTraderData.solSold}
           pnlBreakdown={dailyTraderData.pnlBreakdown}
+          onStatsUpdated={checkJoinStatus}
         />
       </aside>
     );
