@@ -6,6 +6,7 @@ export default function WalletButton() {
   return (
     <WalletMultiButton 
       className="
+        wallet-adapter-button
         !bg-green-500 
         hover:!bg-green-600 
         !rounded-lg 

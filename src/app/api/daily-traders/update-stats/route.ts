@@ -4,15 +4,25 @@ import DailyTrader from '@/models/DailyTrader';
 import User from '@/models/User'; // Required for Mongoose populate to work
 import { getCurrentSeasonId } from '@/lib/seasonUtils';
 import { getWalletPortfolio, transformToTraderData } from '@/lib/axiomService';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 /**
  * POST /api/daily-traders/update-stats
  * Update trader stats from Axiom API for current season
  * 
+ * ⚠️ PROTECTED ENDPOINT - Requires authentication
+ * This endpoint makes external API calls and modifies database
+ * 
  * Request body:
  * - walletAddress (optional): Update specific wallet, or all if not provided
  */
 export async function POST(request: NextRequest) {
+  // Verify authentication
+  const authResult = verifyApiAuth(request);
+  if (!authResult.authorized) {
+    return authResult.response;
+  }
+
   try {
     await dbConnect();
 

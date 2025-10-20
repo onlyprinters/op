@@ -1,17 +1,27 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { claimCreatorFees } from '@/lib/claimFees';
+import { verifyApiAuth } from '@/lib/apiAuth';
 
 /**
  * POST /api/claim-fees
  * Claims creator fees from Pump.fun
+ * 
+ * ⚠️ PROTECTED ENDPOINT - Requires authentication
+ * This endpoint transfers SOL, so it MUST be protected
  * 
  * Body (optional):
  * {
  *   "priorityFee": 0.000001  // Priority fee in SOL
  * }
  */
-export async function POST(request: Request) {
-  console.log('🎁 POST /api/claim-fees - Claiming creator fees');
+export async function POST(request: NextRequest) {
+  // Verify authentication
+  const authResult = verifyApiAuth(request);
+  if (!authResult.authorized) {
+    return authResult.response;
+  }
+
+  console.log('🎁 POST /api/claim-fees - Claiming creator fees (authenticated)');
 
   try {
     const body = await request.json().catch(() => ({}));

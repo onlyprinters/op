@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { WalletContextProvider } from "@/contexts/WalletContextProvider";
 import Header from "@/components/Header";
+import SecurityBadge from "@/components/SecurityBadge";
 
 const fjallaOne = Fjalla_One({
   variable: "--font-fjalla-one",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <WalletContextProvider>
           <Header />
           {children}
+          <SecurityBadge />
         </WalletContextProvider>
       </body>
     </html>

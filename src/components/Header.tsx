@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/WalletContextProvider';
 
@@ -33,8 +34,8 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="flex items-center">
+            <Link href="/" className="flex-shrink-0">
+              <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
                 <Image
                   src="/logo.png"
                   alt="onlyPrinters"
@@ -49,7 +50,7 @@ export default function Header() {
                   <span className="text-gray-900 sm:hidden">P</span>
                 </span>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* User Info and Connect Button */}

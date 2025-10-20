@@ -1,5 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { getAccount, getAssociatedTokenAddress, getMint } from '@solana/spl-token';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
+import { AccountLayout } from '@solana/spl-token';
 
 /**
  * Get user's token balance for a specific token mint
@@ -37,8 +38,14 @@ export async function getTokenBalance(
     }
 
     // Get mint info to get decimals
-    const mintInfo = await getMint(connection, mintPublicKey);
-    const decimals = mintInfo.decimals;
+    const mintAccountInfo = await connection.getAccountInfo(mintPublicKey);
+    if (!mintAccountInfo) {
+      console.error('❌ Token mint not found');
+      return 0;
+    }
+    
+    // Parse mint data to get decimals (byte 44 contains decimals)
+    const decimals = mintAccountInfo.data[44];
     console.log('  Token Decimals:', decimals);
 
     // Get the associated token account address
@@ -51,8 +58,16 @@ export async function getTokenBalance(
 
     // Get the token account info
     try {
-      const tokenAccount = await getAccount(connection, tokenAccountAddress);
-      const rawBalance = Number(tokenAccount.amount);
+      const accountInfo = await connection.getAccountInfo(tokenAccountAddress);
+      if (!accountInfo) {
+        console.log(`❌ Token account not found for wallet ${walletAddress}. Balance: 0`);
+        return 0;
+      }
+      
+      // Decode token account data using AccountLayout
+      const tokenAccountData = AccountLayout.decode(accountInfo.data);
+      const rawBalance = Number(tokenAccountData.amount);
+      
       // Adjust for decimals (e.g., 6974639 with 6 decimals = 6.974639 tokens)
       const actualBalance = rawBalance / Math.pow(10, decimals);
       console.log('  Raw Balance:', rawBalance);

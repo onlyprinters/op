@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useUser } from '@/contexts/WalletContextProvider';
 import { useWallet } from '@solana/wallet-adapter-react';
 import PlayerCard from './PlayerCard';
@@ -292,7 +293,7 @@ export default function Sidebar() {
     <aside className="w-full">
       <div className="bg-white rounded-lg shadow-md p-6 border border-green-200">
         <div className="text-center">
-          <div className="flex justify-center mb-4">
+          <Link href="/" className="flex justify-center mb-4 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="w-20 h-20 rounded-full overflow-hidden">
               <Image
                 src="/logo.png"
@@ -302,7 +303,7 @@ export default function Sidebar() {
                 className="object-cover"
               />
             </div>
-          </div>
+          </Link>
 
           <span className="ml-3 text-2xl font-bold font-[family-name:var(--font-astron-boy)]">
             <span className="text-gray-900">Join </span>
