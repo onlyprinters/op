@@ -227,7 +227,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 - 🌐 **Website**: [onlyprinters.fun](https://onlyprinters.fun)
 - 🐦 **Twitter/X**: [Follow us](https://x.com/onlyprinters_)
 - 💬 **Telegram**: [Join community](https://t.me/onlyprintersfun)
-- 📚 **Security Docs**: [Wallet Security Guide](https://onlyprinters.fun/wallet-security)
+- 📚 **Security Docs**: [Wallet Security Guide](https://onlyprinters.fun/security)
 - 🔍 **Token**: View $PRINT on [To be launched](https://solscan.io)
 
 ---
