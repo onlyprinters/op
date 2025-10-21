@@ -17,7 +17,7 @@
 
 ## 🎯 What is onlyPrinters.fun?
 
-**onlyPrinters.fun** is a revolutionary, fully automated trading competition platform built on Solana. Compete with other traders, showcase your PNL skills, and win SOL prizes — all powered by transparent, open-source code.
+**onlyPrinters.fun** is a fully automated trading competition platform built on Solana for trenchers. Compete with other traders, showcase your PNL skills, and win SOL by get creator rewards — all powered by transparent, open-source code.
 
 ### ✨ Key Features
 
@@ -30,23 +30,6 @@
 
 ---
 
-## 🖼️ Screenshots
-
-<div align="center">
-
-### Competition Dashboard
-![Dashboard](./public/1.png)
-
-### Live Leaderboard
-![Leaderboard](./public/2.png)
-
-### Player Stats
-![Player Card](./public/3.png)
-
-### Winners History
-![Winners Modal](./public/4.png)
-
-</div>
 
 ---
 
@@ -242,10 +225,10 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ## 🔗 Links
 
 - 🌐 **Website**: [onlyprinters.fun](https://onlyprinters.fun)
-- 🐦 **Twitter/X**: [Follow us](https://x.com/onlyprinters)
-- 💬 **Telegram**: [Join community](https://t.me/onlyprinters)
+- 🐦 **Twitter/X**: [Follow us](https://x.com/onlyprinters_)
+- 💬 **Telegram**: [Join community](https://t.me/onlyprintersfun)
 - 📚 **Security Docs**: [Wallet Security Guide](https://onlyprinters.fun/wallet-security)
-- 🔍 **Token**: View $PRINT on [Solana Explorer](https://solscan.io)
+- 🔍 **Token**: View $PRINT on [To be launched](https://solscan.io)
 
 ---
 
@@ -259,8 +242,8 @@ This platform is for entertainment and educational purposes. Trading cryptocurre
 
 Built with passion for the Solana community. Special thanks to:
 - Solana Foundation
-- Axiom.trade for API access
 - Phantom Wallet team
+- Pump.fun creators
 - The amazing $PRINT community
 
 ---
