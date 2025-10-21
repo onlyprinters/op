@@ -150,14 +150,10 @@ We request the **absolute minimum** permissions needed:
 - [How Wallet Adapters Work](https://github.com/solana-labs/wallet-adapter)
 
 ### Audit Our Code:
-- GitHub Repository: [link]
-- Wallet Integration: `src/contexts/WalletContext.tsx`
+- GitHub Repository: [link](https://github.com/onlyprinters/op)
+- Wallet Integration: `src/contexts/WalletContextProvider.tsx`
 - API Endpoints: `src/app/api/`
 
-### Community Verification:
-- Join our Discord: [link]
-- Ask questions on Twitter: [link]
-- Read community reviews: [link]
 
 ## 💡 Pro Tips for Web3 Users
 
@@ -182,9 +178,8 @@ We request the **absolute minimum** permissions needed:
 ## 📞 Report Security Concerns
 
 If you notice anything suspicious:
-- Email: security@[your-domain.com]
-- Discord: [link to security channel]
-- Twitter DM: [@your_twitter]
+- Email: security@[onlyprinters.fun]
+- Twitter DM: [@onlyprinters_]
 
 We take security seriously and respond within 24 hours.
 
