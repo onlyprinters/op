@@ -24,7 +24,7 @@
 - 🎮 **2-Click Entry**: Hold `$PRINT` tokens and join the competition instantly
 - 📊 **Real-Time Leaderboard**: Live PNL tracking powered by Axiom API
 - 💰 **Automated Rewards**: Creator fees claimed every 10 minutes, prizes distributed every 2 hours
-- 🔒 **Wallet Security**: Industry-leading security practices ([learn more](https://onlyprinters.fun/wallet-security))
+- 🔒 **Wallet Security**: Industry-leading security practices ([learn more](https://onlyprinters.fun/security))
 - 🤖 **Fully Automated**: No manual intervention — everything runs on schedule
 - 🌐 **100% Open Source**: Complete transparency, audit our code anytime
 
@@ -110,7 +110,7 @@ We've created a comprehensive security guide covering:
 - Why you can trust onlyPrinters.fun
 - Best practices for wallet security
 
-**Read the full guide**: [Wallet Security Documentation](https://onlyprinters.fun/wallet-security)
+**Read the full guide**: [Wallet Security Documentation](https://onlyprinters.fun/security)
 
 ---
 
