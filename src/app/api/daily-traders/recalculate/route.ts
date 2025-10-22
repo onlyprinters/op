@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     if (!portfolioData) {
       return NextResponse.json(
-        { success: false, error: 'Failed to fetch trading data from Axiom' },
+        { success: false, error: 'Failed to fetch trading data' },
         { status: 500 }
       );
     }

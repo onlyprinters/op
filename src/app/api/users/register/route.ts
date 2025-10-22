@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { verifySignature, isSignatureTimestampValid } from '@/lib/signMessage';
+import { generateToken } from '@/lib/jwt';
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,7 +55,9 @@ export async function POST(request: NextRequest) {
     // Check if user with this wallet already exists
     const existingUser = await User.findOne({ wallet: wallet.toLowerCase() });
     if (existingUser) {
-      // User exists, return their data (login)
+      // User exists, generate JWT token (login)
+      const token = generateToken(String(existingUser._id), existingUser.wallet);
+      
       return NextResponse.json(
         {
           success: true,
@@ -67,6 +70,7 @@ export async function POST(request: NextRequest) {
             createdAt: existingUser.createdAt,
             updatedAt: existingUser.updatedAt,
           },
+          token, // JWT token for session
         },
         { status: 200 }
       );
@@ -79,6 +83,9 @@ export async function POST(request: NextRequest) {
       name,
     });
 
+    // Generate JWT token for new user
+    const token = generateToken(String(user._id), user.wallet);
+
     return NextResponse.json(
       {
         success: true,
@@ -90,6 +97,7 @@ export async function POST(request: NextRequest) {
           avatar: user.avatar,
           createdAt: user.createdAt,
         },
+        token, // JWT token for session
       },
       { status: 201 }
     );

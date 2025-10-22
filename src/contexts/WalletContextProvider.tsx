@@ -12,7 +12,7 @@ import {
   WalletModalProvider,
 } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
-import { registerOrLoginUser, UserData } from '@/lib/userService';
+import { registerOrLoginUser, getUserFromToken, clearToken, UserData } from '@/lib/userService';
 
 // Import wallet adapter styles
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -39,11 +39,12 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   const refreshUser = async () => {
-    // If wallet is not connected, clear user and return early
-    if (!publicKey || !connected || !signMessage) {
+    // If wallet is not connected, clear user and token
+    if (!publicKey || !connected) {
       console.log('🔌 Wallet not connected, clearing user data');
       setUser(null);
       setLoading(false);
+      clearToken(); // Clear token from localStorage
       return;
     }
 
@@ -51,6 +52,26 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       const walletAddress = publicKey.toBase58();
       console.log('🔄 Refreshing user for wallet:', walletAddress);
+      
+      // First, try to authenticate with existing token
+      const tokenUser = await getUserFromToken();
+      
+      if (tokenUser && tokenUser.wallet.toLowerCase() === walletAddress.toLowerCase()) {
+        console.log('✅ User authenticated via token (no signature required)');
+        setUser(tokenUser);
+        setLoading(false);
+        return;
+      }
+      
+      // Token invalid or doesn't match wallet - request signature
+      console.log('🔑 Token invalid/missing, requesting signature...');
+      
+      if (!signMessage) {
+        console.log('⚠️ signMessage not available');
+        setUser(null);
+        setLoading(false);
+        return;
+      }
       
       const userData = await registerOrLoginUser(walletAddress, signMessage);
       
@@ -70,6 +91,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
         console.error('❌ Error refreshing user:', error);
       }
       setUser(null);
+      clearToken();
     } finally {
       setLoading(false);
     }

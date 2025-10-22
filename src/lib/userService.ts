@@ -3,6 +3,9 @@ import bs58 from 'bs58';
 
 // Client-side service for user registration and login
 
+// LocalStorage key for JWT token
+const TOKEN_STORAGE_KEY = 'onlyprinters_auth_token';
+
 export interface UserData {
   id: string;
   wallet: string;
@@ -17,6 +20,69 @@ interface ApiResponse {
   success: boolean;
   data?: UserData;
   error?: string;
+  token?: string; // JWT token for session
+}
+
+/**
+ * Save JWT token to localStorage
+ */
+function saveToken(token: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  }
+}
+
+/**
+ * Get JWT token from localStorage
+ */
+function getToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(TOKEN_STORAGE_KEY);
+  }
+  return null;
+}
+
+/**
+ * Clear JWT token from localStorage
+ */
+export function clearToken(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  }
+}
+
+/**
+ * Try to get user data using existing JWT token
+ * Returns user data if token is valid, null otherwise
+ */
+export async function getUserFromToken(): Promise<UserData | null> {
+  const token = getToken();
+  if (!token) return null;
+
+  try {
+    const response = await fetch('/api/users/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const result: ApiResponse = await response.json();
+      if (result.success && result.data) {
+        console.log('✅ User authenticated via token');
+        return result.data;
+      }
+    }
+
+    // Token invalid/expired, clear it
+    clearToken();
+    return null;
+  } catch (error) {
+    console.error('❌ Error validating token:', error);
+    clearToken();
+    return null;
+  }
 }
 
 /**
@@ -77,6 +143,13 @@ export async function registerOrLoginUser(
       const result: ApiResponse = await registerResponse.json();
       if (result.success && result.data) {
         console.log('✅ User authenticated:', result.data);
+        
+        // Save JWT token to localStorage
+        if (result.token) {
+          saveToken(result.token);
+          console.log('🔑 Session token saved');
+        }
+        
         return result.data;
       }
     } else {
