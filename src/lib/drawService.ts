@@ -113,10 +113,11 @@ export async function performDraw(): Promise<{ success: boolean; drawId?: string
       return { success: true, drawId };
     }
 
-    // Get top 3 traders by realized PNL
+    // Get top 3 traders by realized PNL (excluding those who sold $PRINT)
     const topTraders = await DailyTrader.find({
       seasonId,
       isActive: true,
+      soldPrint: { $ne: true }, // Exclude disqualified traders
     })
       .populate('userId', 'name avatar wallet walletOriginal')
       .sort({ realizedUsdPnl: -1 })
