@@ -48,8 +48,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get required token balance from environment (default to 0)
-    const requiredBalance = parseFloat(process.env.OP_TOKEN_REQUIRED || '0');
+    // Get required token balance from environment (default: 100,000 $PRINT)
+    const requiredBalance = parseFloat(process.env.OP_TOKEN_REQUIRED || '100000');
 
     console.log(`🔍 Checking wallet ${wallet} for token balance...`);
 

@@ -38,7 +38,7 @@
 ### For Participants
 
 1. **Hold `$PRINT` Tokens**  
-   Own any amount of `$PRINT` tokens in your Solana wallet
+   Own **100,000 $PRINT** tokens in your Solana wallet to join
 
 2. **Connect & Join (2 Clicks)**  
    - Connect your Phantom wallet

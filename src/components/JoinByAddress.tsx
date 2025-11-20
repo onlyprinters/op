@@ -138,17 +138,17 @@ export default function JoinByAddress({ onSuccess }: JoinByAddressProps) {
   };
 
   const getBorderColor = () => {
-    if (!walletAddress) return 'border-gray-700';
-    if (addressError) return 'border-red-500';
+    if (!walletAddress) return 'border-gray-300';
+    if (addressError) return 'border-red-400';
     if (validationResult?.success) return 'border-green-500';
-    if (validationResult && !validationResult.success) return 'border-red-500';
-    return 'border-gray-700';
+    if (validationResult && !validationResult.success) return 'border-red-400';
+    return 'border-gray-300';
   };
 
   return (
     <div className="space-y-4">
       <div>
-        <label htmlFor="wallet-address" className="block text-sm font-medium text-gray-300 mb-2">
+        <label htmlFor="wallet-address" className="block text-sm font-medium text-gray-700 mb-2">
           Solana Wallet Address
         </label>
         <input
@@ -157,26 +157,26 @@ export default function JoinByAddress({ onSuccess }: JoinByAddressProps) {
           value={walletAddress}
           onChange={handleAddressChange}
           placeholder="Enter Solana wallet address..."
-          className={`w-full px-4 py-3 bg-gray-800 border ${getBorderColor()} rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
+          className={`w-full px-4 py-3 bg-white border-2 ${getBorderColor()} rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors`}
           disabled={isValidating || isJoining}
         />
         {addressError && (
-          <p className="mt-1 text-sm text-red-500">{addressError}</p>
+          <p className="mt-1 text-sm text-red-600">{addressError}</p>
         )}
       </div>
 
       {validationResult && (
-        <div className={`p-4 rounded-lg ${validationResult.success ? 'bg-green-900/20 border border-green-500' : 'bg-red-900/20 border border-red-500'}`}>
+        <div className={`p-4 rounded-lg ${validationResult.success ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-400'}`}>
           {validationResult.success && validationResult.data ? (
             <div className="space-y-2">
-              <p className="text-green-400 font-medium">✅ Wallet is eligible!</p>
-              <div className="text-sm text-gray-300 space-y-1">
-                <p>Token Balance: <span className="font-mono text-green-400">{validationResult.data.tokenBalance.toFixed(2)}</span></p>
-                <p>Required: <span className="font-mono text-gray-400">{validationResult.data.requiredBalance.toFixed(2)}</span></p>
+              <p className="text-green-700 font-medium">✅ Wallet is eligible!</p>
+              <div className="text-sm text-gray-700 space-y-1">
+                <p>Token Balance: <span className="font-mono text-green-700 font-semibold">{validationResult.data.tokenBalance.toLocaleString()}</span></p>
+                <p>Required: <span className="font-mono text-gray-600">{validationResult.data.requiredBalance.toLocaleString()}</span></p>
               </div>
             </div>
           ) : (
-            <p className="text-red-400">❌ {validationResult.error}</p>
+            <p className="text-red-700">❌ {validationResult.error}</p>
           )}
         </div>
       )}
@@ -185,7 +185,11 @@ export default function JoinByAddress({ onSuccess }: JoinByAddressProps) {
         <button
           onClick={handleCheckEligibility}
           disabled={!walletAddress || !!addressError || isValidating || isJoining}
-          className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+          className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors shadow-sm hover:shadow-md ${
+            !walletAddress || !!addressError || isValidating || isJoining
+              ? 'bg-gray-400 cursor-not-allowed text-white'
+              : 'bg-green-500 hover:bg-green-600 text-white'
+          }`}
         >
           {isValidating ? 'Checking...' : 'Check Eligibility'}
         </button>
@@ -194,14 +198,18 @@ export default function JoinByAddress({ onSuccess }: JoinByAddressProps) {
           <button
             onClick={handleJoinTournament}
             disabled={isJoining}
-            className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+            className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors shadow-sm hover:shadow-md ${
+              isJoining
+                ? 'bg-gray-400 cursor-not-allowed text-white'
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
           >
             {isJoining ? 'Joining...' : 'Join Tournament'}
           </button>
         )}
       </div>
 
-      <p className="text-xs text-gray-500 text-center">
+      <p className="text-xs text-gray-600 text-center">
         Enter any Solana wallet address to check eligibility and join the tournament
       </p>
     </div>
