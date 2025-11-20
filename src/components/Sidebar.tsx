@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useUser } from '@/contexts/WalletContextProvider';
 import { useWallet } from '@solana/wallet-adapter-react';
 import PlayerCard from './PlayerCard';
+import JoinByAddress from './JoinByAddress';
 
 interface DailyTraderData {
   tokenBalance: number;
@@ -50,6 +51,7 @@ export default function Sidebar() {
     totalVolumeUsd: 0,
     totalTrades: 0,
   });
+  const [joinMethod, setJoinMethod] = useState<'wallet' | 'address'>('wallet');
 
   const checkJoinStatus = useCallback(async () => {
     console.log('🔍 Checking if user joined season', {
@@ -318,6 +320,30 @@ export default function Sidebar() {
             Compete with the best traders on Solana. Track your performance and climb the leaderboard.
           </p>
 
+          {/* Join Method Tabs */}
+          <div className="mb-4 flex rounded-lg bg-gray-100 p-1">
+            <button
+              onClick={() => setJoinMethod('wallet')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                joinMethod === 'wallet'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Connect Wallet
+            </button>
+            <button
+              onClick={() => setJoinMethod('address')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                joinMethod === 'address'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Paste Address
+            </button>
+          </div>
+
           {message && (
             <div
               className={`mb-4 p-3 rounded-lg text-sm ${message.type === 'success'
@@ -329,17 +355,32 @@ export default function Sidebar() {
             </div>
           )}
 
-          {/* Sign Up Button */}
-          <button
-            onClick={handleJoin}
-            disabled={loading || hasJoined || !connected}
-            className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors shadow-sm hover:shadow-md ${loading || hasJoined || !connected
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-green-500 hover:bg-green-600 text-white'
-              }`}
-          >
-            {loading ? 'Checking...' : hasJoined ? 'Joined Today!' : connected ? 'Sign Up Now' : 'Connect Wallet'}
-          </button>
+          {/* Join Method Content */}
+          {joinMethod === 'wallet' ? (
+            /* Sign Up Button */
+            <button
+              onClick={handleJoin}
+              disabled={loading || hasJoined || !connected}
+              className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors shadow-sm hover:shadow-md ${loading || hasJoined || !connected
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-500 hover:bg-green-600 text-white'
+                }`}
+            >
+              {loading ? 'Checking...' : hasJoined ? 'Joined Today!' : connected ? 'Sign Up Now' : 'Connect Wallet'}
+            </button>
+          ) : (
+            /* Join by Address Form */
+            <JoinByAddress
+              onSuccess={() => {
+                setMessage({
+                  type: 'success',
+                  text: 'Wallet successfully joined! 🎉',
+                });
+                // Trigger leaderboard refresh
+                window.dispatchEvent(new Event('refreshLeaderboard'));
+              }}
+            />
+          )}
 
           {/* Stats */}
           <div className="mt-6 pt-6 border-t border-gray-200">
