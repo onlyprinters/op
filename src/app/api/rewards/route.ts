@@ -5,9 +5,9 @@ import bs58 from 'bs58';
 const SOLANA_RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT || 'https://api.mainnet-beta.solana.com';
 const DEV_PK = process.env.DEV_PK; // This is actually the PRIVATE key (base58)
 
-// GET endpoint to fetch rewards (50% of dev wallet balance)
+// GET endpoint to fetch rewards (100% of dev wallet balance)
 export async function GET() {
-  console.log('🎁 GET /api/rewards - Fetching rewards from fees');
+  console.log('🎁 GET /api/rewards - Fetching creator rewards');
   
   try {
     if (!DEV_PK) {
@@ -38,11 +38,11 @@ export async function GET() {
     // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
     const balanceSOL = balanceLamports / 1_000_000_000;
     
-    // Calculate 50% as rewards
-    const rewardsSOL = balanceSOL * 0.5;
+    // 100% of dev wallet balance is the creator rewards pool
+    const rewardsSOL = balanceSOL;
 
     console.log('💰 Dev wallet balance:', balanceSOL, 'SOL');
-    console.log('🎁 Rewards (50%):', rewardsSOL, 'SOL');
+    console.log('🎁 Creator Rewards Pool (100%):', rewardsSOL, 'SOL');
 
     return NextResponse.json({
       success: true,
@@ -50,7 +50,7 @@ export async function GET() {
         devWallet: devPublicKey.toBase58(), // Return public key, not private!
         totalBalance: balanceSOL,
         rewardsPool: rewardsSOL,
-        percentage: 50,
+        percentage: 100,
         timestamp: new Date().toISOString(),
       },
     });

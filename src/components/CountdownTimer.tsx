@@ -143,9 +143,26 @@ export default function CountdownTimer({ rewardPool }: CountdownTimerProps) {
             <p className="text-xs text-gray-600 leading-tight">
               Every 2 hours: Top 3 traders compete
             </p>
-            <p className="text-xs font-semibold text-green-600">
-              Winner gets 10% of total pool!
-            </p>
+            <div className="flex items-center gap-2 justify-center mt-2">
+              <p className="text-xs font-semibold text-green-600">
+                Next Prize:
+              </p>
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-bold text-gray-900">
+                  {(rewardPool * 0.1).toFixed(3)}
+                </span>
+                <svg
+                  className="w-3 h-3 text-green-500"
+                  viewBox="0 0 397.7 311.7"
+                  fill="currentColor"
+                >
+                  <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" />
+                  <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" />
+                  <path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" />
+                </svg>
+              </div>
+              <span className="text-xs text-gray-500">(10% of pool)</span>
+            </div>
             <button
               onClick={() => setShowWinnersModal(true)}
               className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 mx-auto"

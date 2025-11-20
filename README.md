@@ -21,12 +21,14 @@
 
 ### ✨ Key Features
 
-- 🎮 **2-Click Entry**: Hold `$PRINT` tokens and join the competition instantly
+- 🎮 **Dual Join Methods**: Connect your wallet OR paste any Solana address to join
+- 📝 **Custom Profiles**: Authenticated users can edit their name (2 changes per 24h limit)
 - 📊 **Real-Time Leaderboard**: Live PNL tracking powered by Axiom API
 - 💰 **Automated Rewards**: Creator fees claimed every 10 minutes, prizes distributed every 2 hours
-- 🔒 **Wallet Security**: Industry-leading security practices ([learn more](https://onlyprinters.fun/security))
+- 🔒 **Wallet Security**: Industry-leading security practices with JWT session tokens ([learn more](https://onlyprinters.fun/security))
 - 🤖 **Fully Automated**: No manual intervention — everything runs on schedule
 - 🌐 **100% Open Source**: Complete transparency, audit our code anytime
+- 🎯 **Token-Gated**: Requires 100,000 $PRINT tokens to participate
 
 ---
 
@@ -40,10 +42,27 @@
 1. **Hold `$PRINT` Tokens**  
    Own **100,000 $PRINT** tokens in your Solana wallet to join
 
-2. **Connect & Join (2 Clicks)**  
+2. **Join the Competition** — Two Methods Available:
+
+   **Method 1: Connect Wallet (Recommended)**
    - Connect your Phantom wallet
-   - Click "Join Competition"
+   - Choose a custom display name
+   - Sign the authentication message
+   - Instant access to edit your profile and stats
    - That's it! You're in for the current 24-hour season
+
+   **Method 2: Paste Any Address**
+   - Click "Paste Address" tab
+   - Enter any Solana wallet address (your own or someone else's)
+   - No wallet connection needed
+   - Anonymous entry with auto-generated name (first 4 characters)
+   - Perfect for:
+     - Registering wallets you don't have access to right now
+     - Adding friends/other traders to the competition
+     - Bulk registrations
+     - Using cold storage wallets
+
+   > **Note**: Only wallets registered via Method 1 (wallet connect) can edit their name and access full profile features. Anonymous entries are read-only.
 
 3. **Trade & Compete**  
    Your trading performance is tracked automatically:
