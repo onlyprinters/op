@@ -117,7 +117,11 @@ export async function performDraw(): Promise<{ success: boolean; drawId?: string
     const topTraders = await DailyTrader.find({
       seasonId,
       isActive: true,
-      soldPrint: { $ne: true }, // Exclude disqualified traders
+      $or: [
+        { soldPrint: false },
+        { soldPrint: { $exists: false } },
+        { soldPrint: null }
+      ]
     })
       .populate('userId', 'name avatar wallet walletOriginal')
       .sort({ realizedUsdPnl: -1 })
