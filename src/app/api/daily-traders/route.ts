@@ -19,13 +19,17 @@ export async function GET(request: NextRequest) {
 
     console.log('Fetching daily traders for season:', seasonId);
     await User.init();
-    // Get all daily traders for this season, sorted by realized USD PNL (one day)
+    // Get all daily traders for this season
+    // Sort: soldPrint=false first (ranked by PNL), then soldPrint=true (disqualified, at bottom)
     const dailyTraders = await DailyTrader.find({
       seasonId: seasonId,
       isActive: true,
     })
       .populate('userId', 'name avatar wallet walletOriginal')
-      .sort({ realizedUsdPnl: -1 }) // Sort by realized USD PNL from one day trading
+      .sort({ 
+        soldPrint: 1,        // false (0) before true (1) - valid traders first
+        realizedUsdPnl: -1   // Then sort by PNL descending
+      })
       .limit(limit)
       .lean();
 

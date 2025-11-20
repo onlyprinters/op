@@ -261,10 +261,15 @@ export default function TraderLeaderboard() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {traders.map((trader, index) => {
+              {traders.map((trader) => {
                 const totalTradeVolume = trader.usdBought + trader.usdSold;
                 const isCurrentUser = user && trader.walletAddress && user.wallet && 
                   trader.walletAddress.toLowerCase() === user.wallet.toLowerCase();
+                
+                // Calculate rank: only count traders who haven't sold $PRINT
+                const validTraders = traders.filter(t => !t.soldPrint);
+                const rankNumber = validTraders.findIndex(t => t.id === trader.id) + 1;
+                const isDisqualified = trader.soldPrint;
                 
                 return (
                   <tr 
@@ -272,14 +277,20 @@ export default function TraderLeaderboard() {
                     className={`transition-colors ${
                       isCurrentUser 
                         ? 'bg-green-100 hover:bg-green-200 border-l-4 border-green-500' 
+                        : isDisqualified
+                        ? 'bg-red-50 hover:bg-red-100 opacity-60'
                         : 'hover:bg-green-50'
                     }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <span className={`text-sm font-bold ${isCurrentUser ? 'text-green-700' : 'text-gray-900'}`}>
-                          #{index + 1}
-                        </span>
+                        {isDisqualified ? (
+                          <span className="text-sm font-bold text-red-600">DQ</span>
+                        ) : (
+                          <span className={`text-sm font-bold ${isCurrentUser ? 'text-green-700' : 'text-gray-900'}`}>
+                            #{rankNumber}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
