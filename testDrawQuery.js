@@ -50,8 +50,43 @@ async function testDrawQuery() {
     await mongoose.connect(MONGO_URI);
     console.log('✅ Connected to MongoDB\n');
 
-    const seasonId = getCurrentSeasonId();
+    let seasonId = getCurrentSeasonId();
     console.log(`📅 Current Season ID: ${seasonId}\n`);
+
+    // First, check what's in the database
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🔍 DATABASE CHECK');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    
+    const totalTraders = await DailyTrader.countDocuments({});
+    console.log(`Total DailyTrader documents in DB: ${totalTraders}`);
+    
+    if (totalTraders > 0) {
+      const allSeasons = await DailyTrader.distinct('seasonId');
+      console.log(`Seasons found: ${allSeasons.join(', ')}`);
+      
+      const activeCount = await DailyTrader.countDocuments({ isActive: true });
+      const inactiveCount = await DailyTrader.countDocuments({ isActive: false });
+      console.log(`Active traders (all seasons): ${activeCount}`);
+      console.log(`Inactive traders (all seasons): ${inactiveCount}`);
+      
+      const currentSeasonCount = await DailyTrader.countDocuments({ seasonId });
+      console.log(`Traders in current season (${seasonId}): ${currentSeasonCount}`);
+      
+      if (currentSeasonCount === 0 && allSeasons.length > 0) {
+        console.log('\n⚠️  No traders in current season. Showing latest season instead...');
+        const latestSeason = allSeasons.sort().reverse()[0];
+        console.log(`Latest season: ${latestSeason}\n`);
+        // Update seasonId to latest for queries below
+        seasonId = latestSeason;
+      }
+    } else {
+      console.log('⚠️  No DailyTrader documents found in database!\n');
+      await mongoose.connection.close();
+      console.log('🔌 Disconnected from MongoDB');
+      return;
+    }
+    console.log('');
 
     // Query 1: ALL active traders (including soldPrint=true)
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
