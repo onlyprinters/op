@@ -60,4 +60,5 @@ export interface Trader {
   realizedUsdSold: number;
   
   joinedAt: Date;
+  soldPrint?: boolean; // True if token balance dropped below required
 }

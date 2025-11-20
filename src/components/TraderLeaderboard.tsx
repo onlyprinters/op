@@ -53,7 +53,7 @@ export default function TraderLeaderboard() {
 
         if (result.success && result.data.traders) {
           // Map API data to Trader interface
-          const mappedTraders: Trader[] = result.data.traders.map((trader: Trader & { name: string; wallet: string; walletOriginal: string }) => ({
+          const mappedTraders: Trader[] = result.data.traders.map((trader: Trader & { name: string; wallet: string; walletOriginal: string; soldPrint?: boolean }) => ({
             id: trader.id,
             walletAddress: trader.wallet, // API returns 'wallet', not 'walletAddress'
             walletOriginal: trader.walletOriginal, // Original case-sensitive wallet
@@ -76,6 +76,7 @@ export default function TraderLeaderboard() {
             realizedUsdBought: trader.realizedUsdBought,
             realizedUsdSold: trader.realizedUsdSold,
             joinedAt: new Date(trader.joinedAt),
+            soldPrint: trader.soldPrint || false,
           }));
 
           setTraders(mappedTraders);
@@ -294,6 +295,11 @@ export default function TraderLeaderboard() {
                           <div className={`text-sm font-medium flex items-center gap-2 ${isCurrentUser ? 'text-green-700 font-bold' : 'text-gray-900'}`}>
                             {trader.displayName}
                             {isCurrentUser && <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">YOU</span>}
+                            {trader.soldPrint && (
+                              <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-semibold" title="Token balance below required amount">
+                                SOLD $PRINT
+                              </span>
+                            )}
                             <button
                               onClick={() => copyToClipboard(trader.walletOriginal)}
                               className="text-gray-400 hover:text-green-600 transition-colors"

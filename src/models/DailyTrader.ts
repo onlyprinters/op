@@ -44,6 +44,8 @@ export interface IDailyTrader extends Document {
   
   joinedAt: Date;
   isActive: boolean;
+  soldPrint: boolean; // True if token balance dropped below required amount
+  lastTokenCheck: Date; // Last time token balance was verified
   createdAt: Date;
   updatedAt: Date;
 }
@@ -177,6 +179,14 @@ const DailyTraderSchema = new Schema<IDailyTrader>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    soldPrint: {
+      type: Boolean,
+      default: false,
+    },
+    lastTokenCheck: {
+      type: Date,
+      default: null,
     },
   },
   {

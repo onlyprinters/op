@@ -2,6 +2,7 @@
  * Cron jobs for scheduled tasks
  * - Updates trader stats from Axiom API every 10 minutes
  * - Claims creator fees from Pump.fun every 15 minutes
+ * - Validates token holdings every 30 minutes (flags traders who sold $PRINT)
  * - Performs prize draws every 2 hours (at even hours)
  * 
  * ⚠️ SECURITY NOTE:
@@ -17,8 +18,10 @@ import { getCurrentSeasonId } from './seasonUtils';
 import { getWalletPortfolio, transformToTraderData } from './axiomService';
 import { claimCreatorFees } from './claimFees';
 import { performDraw, shouldPerformDraw } from './drawService';
+import { hasRequiredTokenBalance } from './tokenService';
 
 let isJobRunning = false;
+let isTokenCheckRunning = false;
 
 /**
  * Update all traders stats from Axiom API
@@ -130,6 +133,104 @@ async function claimCreatorFeesTask() {
 }
 
 /**
+ * Validate token holdings for all active traders
+ * Runs every 30 minutes to check if traders still hold required $PRINT tokens
+ */
+async function validateTokenHoldings() {
+  if (isTokenCheckRunning) {
+    console.log('⏭️  Skipping token validation - previous check still running');
+    return;
+  }
+
+  try {
+    isTokenCheckRunning = true;
+    const seasonId = getCurrentSeasonId();
+    const requiredBalance = parseInt(process.env.OP_TOKEN_REQUIRED || '100000', 10);
+    const tokenMint = process.env.OP_TOKEN_MINT;
+    const rpcEndpoint = process.env.SOLANA_RPC_ENDPOINT || 'https://api.mainnet-beta.solana.com';
+
+    if (!tokenMint) {
+      console.error('❌ [TOKEN-CHECK] OP_TOKEN_MINT not configured');
+      return;
+    }
+
+    console.log(`🔍 [TOKEN-CHECK] Starting token validation for season: ${seasonId}`);
+
+    await dbConnect();
+    await User.init();
+
+    // Get all active traders in current season
+    const traders = await DailyTrader.find({ 
+      seasonId,
+      isActive: true,
+    }).populate('userId', 'walletOriginal');
+
+    if (!traders || traders.length === 0) {
+      console.log('ℹ️  [TOKEN-CHECK] No active traders found for current season');
+      return;
+    }
+
+    console.log(`🔍 [TOKEN-CHECK] Checking ${traders.length} traders...`);
+
+    let flagged = 0;
+    let stillValid = 0;
+
+    for (const trader of traders) {
+      try {
+        const userId = trader.userId as { walletOriginal?: string };
+        if (!userId?.walletOriginal) {
+          console.warn(`⚠️  [TOKEN-CHECK] Skipping trader ${trader._id} - missing wallet`);
+          continue;
+        }
+
+        // Check current token balance
+        const { hasBalance, balance } = await hasRequiredTokenBalance(
+          userId.walletOriginal,
+          tokenMint,
+          requiredBalance,
+          rpcEndpoint
+        );
+
+        if (!hasBalance && !trader.soldPrint) {
+          // Trader sold $PRINT - flag them
+          await DailyTrader.findByIdAndUpdate(trader._id, {
+            soldPrint: true,
+            lastTokenCheck: new Date(),
+          });
+          
+          console.log(`🚫 [TOKEN-CHECK] FLAGGED: ${userId.walletOriginal.substring(0, 8)}... (${balance.toLocaleString()} < ${requiredBalance.toLocaleString()})`);
+          flagged++;
+        } else if (hasBalance && trader.soldPrint) {
+          // Trader bought back $PRINT - unflag them
+          await DailyTrader.findByIdAndUpdate(trader._id, {
+            soldPrint: false,
+            lastTokenCheck: new Date(),
+          });
+          
+          console.log(`✅ [TOKEN-CHECK] RESTORED: ${userId.walletOriginal.substring(0, 8)}... (${balance.toLocaleString()} >= ${requiredBalance.toLocaleString()})`);
+          stillValid++;
+        } else {
+          // Update last check time
+          await DailyTrader.findByIdAndUpdate(trader._id, {
+            lastTokenCheck: new Date(),
+          });
+          stillValid++;
+        }
+      } catch (error) {
+        console.error(`❌ [TOKEN-CHECK] Failed to check trader ${trader._id}:`, error);
+      }
+    }
+
+    console.log(`✅ [TOKEN-CHECK] Completed: ${flagged} flagged, ${stillValid} still valid`);
+
+  } catch (error) {
+    console.error('❌ [TOKEN-CHECK] Error validating token holdings:', error);
+  } finally {
+    isTokenCheckRunning = false;
+  }
+}
+
+/**
  * Perform prize draw task
  * Runs every 2 hours at even hours (00, 02, 04, etc.)
  */
@@ -188,6 +289,16 @@ export function initializeCronJobs() {
   console.log(`✅ Cron job scheduled: Claim creator fees every 15 minutes`);
   console.log(`   Fee claiming is currently: ${claimEnabled ? '🟢 ENABLED' : '🔴 DISABLED'}`);
 
+  // Validate token holdings every 30 minutes
+  // Cron pattern: '*/30 * * * *' = every 30 minutes
+  const tokenCheckJob = cron.schedule('*/30 * * * *', () => {
+    validateTokenHoldings();
+  }, {
+    timezone: 'UTC'
+  });
+
+  console.log(`✅ Cron job scheduled: Validate token holdings every 30 minutes`);
+
   // Perform prize draw every 2 hours at even hours (00:00, 02:00, 04:00, etc.)
   // Cron pattern: '0 */2 * * *' = every 2 hours at minute 0
   const prizeDrawJob = cron.schedule('0 */2 * * *', () => {
@@ -209,6 +320,7 @@ export function initializeCronJobs() {
   return {
     updateStatsJob,
     claimFeesJob,
+    tokenCheckJob,
     prizeDrawJob,
   };
 }
@@ -221,6 +333,7 @@ export function stopCronJobs(jobs: ReturnType<typeof initializeCronJobs>) {
   console.log('🛑 Stopping cron jobs...');
   jobs.updateStatsJob.stop();
   jobs.claimFeesJob.stop();
+  jobs.tokenCheckJob.stop();
   jobs.prizeDrawJob.stop();
   console.log('✅ All cron jobs stopped');
 }

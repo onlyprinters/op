@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
         realizedUsdSold: Number(trader.realizedUsdSold) || 0,
         
         tokenBalance: Number(trader.tokenBalance) || 0,
+        soldPrint: Boolean(trader.soldPrint) || false,
         joinedAt: trader.joinedAt,
       };
     });
