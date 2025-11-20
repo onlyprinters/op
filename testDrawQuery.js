@@ -47,8 +47,10 @@ const User = mongoose.models.User || mongoose.model('User', UserSchema);
 async function testDrawQuery() {
   try {
     console.log('🔌 Connecting to MongoDB...');
-    await mongoose.connect(MONGO_URI);
-    console.log('✅ Connected to MongoDB\n');
+    await mongoose.connect(MONGO_URI, {
+      dbName: 'OP',
+    });
+    console.log('✅ Connected to MongoDB (database: OP)\n');
 
     let seasonId = getCurrentSeasonId();
     console.log(`📅 Current Season ID: ${seasonId}\n`);
