@@ -138,7 +138,7 @@ export async function performDraw(): Promise<{ success: boolean; drawId?: string
     const participants = topTraders.map((trader, index) => {
       const user = trader.userId as unknown as { name: string; avatar: string; wallet: string; walletOriginal: string };
       const rank = index + 1;
-      const winChance = rank === 1 ? 40 : rank === 2 ? 35 : 25;
+      const winChance = rank === 1 ? 55 : rank === 2 ? 30 : 15;
 
       return {
         userId: trader.userId,

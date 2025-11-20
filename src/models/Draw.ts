@@ -8,7 +8,7 @@ export interface IDrawParticipant {
   avatar: string;
   rank: number; // 1, 2, or 3
   realizedPnl: number;
-  winChance: number; // 40, 35, or 25
+  winChance: number; // 55, 30, or 15
 }
 
 export interface IDraw extends Document {

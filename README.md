@@ -75,9 +75,9 @@
    - **Every 2 hours**: One draw among Top 3
    - **Prize**: 10% of accumulated creator fees
    - **Winning Chances**: 
-     - 🥇 1st Place: **40%**
-     - 🥈 2nd Place: **35%**
-     - 🥉 3rd Place: **25%**
+     - 🥇 1st Place: **55%**
+     - 🥈 2nd Place: **30%**
+     - 🥉 3rd Place: **15%**
 
 ### Automated Systems
 
@@ -102,7 +102,7 @@ Scans developer wallet for Solana tokens
 ```
 Checks accumulated prize pool (min 0.01 SOL)
 ├── Selects Top 3 traders by realized PNL
-├── Weighted random selection (40/35/25%)
+├── Weighted random selection (55/30/15%)
 ├── Sends 10% of pool to winner
 ├── Records draw in transparent history
 └── Transaction visible on Solana Explorer
