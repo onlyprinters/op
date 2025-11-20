@@ -1,7 +1,7 @@
 /**
  * Cron jobs for scheduled tasks
  * - Updates trader stats from Axiom API every 10 minutes
- * - Claims creator fees from Pump.fun after each stats update
+ * - Claims creator fees from Pump.fun every 15 minutes
  * - Performs prize draws every 2 hours (at even hours)
  * 
  * ⚠️ SECURITY NOTE:
@@ -91,9 +91,6 @@ async function updateAllTradersStats() {
       console.warn(`⚠️  [CRON] Failed to update ${failed} traders`);
     }
 
-    // After successful stats update, claim creator fees
-    await claimCreatorFeesTask();
-
   } catch (error) {
     console.error('❌ [CRON] Error updating trader stats:', error);
   } finally {
@@ -103,7 +100,7 @@ async function updateAllTradersStats() {
 
 /**
  * Claim creator fees from Pump.fun
- * Called after each trader stats update
+ * Called independently every 15 minutes
  * This function is called DIRECTLY by cron (not via HTTP)
  */
 async function claimCreatorFeesTask() {
@@ -179,6 +176,18 @@ export function initializeCronJobs() {
 
   console.log('✅ Cron job scheduled: Update trader stats every 10 minutes');
 
+  // Claim creator fees every 15 minutes
+  // Cron pattern: '*/15 * * * *' = every 15 minutes
+  const claimFeesJob = cron.schedule('*/15 * * * *', () => {
+    claimCreatorFeesTask();
+  }, {
+    timezone: 'UTC'
+  });
+
+  const claimEnabled = process.env.SHOULD_CLAIM_FEES === 'true';
+  console.log(`✅ Cron job scheduled: Claim creator fees every 15 minutes`);
+  console.log(`   Fee claiming is currently: ${claimEnabled ? '🟢 ENABLED' : '🔴 DISABLED'}`);
+
   // Perform prize draw every 2 hours at even hours (00:00, 02:00, 04:00, etc.)
   // Cron pattern: '0 */2 * * *' = every 2 hours at minute 0
   const prizeDrawJob = cron.schedule('0 */2 * * *', () => {
@@ -199,6 +208,7 @@ export function initializeCronJobs() {
 
   return {
     updateStatsJob,
+    claimFeesJob,
     prizeDrawJob,
   };
 }
@@ -210,6 +220,7 @@ export function initializeCronJobs() {
 export function stopCronJobs(jobs: ReturnType<typeof initializeCronJobs>) {
   console.log('🛑 Stopping cron jobs...');
   jobs.updateStatsJob.stop();
+  jobs.claimFeesJob.stop();
   jobs.prizeDrawJob.stop();
   console.log('✅ All cron jobs stopped');
 }
