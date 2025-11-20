@@ -5,6 +5,7 @@ export interface IUser extends Document {
   walletOriginal: string; // Original case-sensitive wallet address for Solana operations
   name: string;
   avatar: string;
+  nameChangeHistory: Date[]; // Track when name was changed (max 2 changes per 24h)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +38,10 @@ const UserSchema = new Schema<IUser>(
         const randomNum = Math.floor(Math.random() * 20) + 1;
         return `/${randomNum}.png`;
       },
+    },
+    nameChangeHistory: {
+      type: [Date],
+      default: [],
     },
   },
   {

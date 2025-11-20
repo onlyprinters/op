@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useUser } from '@/contexts/WalletContextProvider';
 
 interface PlayerCardProps {
   name: string;
@@ -68,9 +69,122 @@ export default function PlayerCard({
   pnlBreakdown,
   onStatsUpdated,
 }: PlayerCardProps) {
+  const { refreshUser } = useUser();
   const isProfitable = totalPnl >= 0;
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [recalcMessage, setRecalcMessage] = useState<string | null>(null);
+  
+  // Name editing
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(name);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [isSavingName, setIsSavingName] = useState(false);
+  const [changesRemaining, setChangesRemaining] = useState<number | null>(null);
+
+  const validateName = (newName: string): boolean => {
+    if (!newName || newName.trim() === '') {
+      setNameError('Name cannot be empty');
+      return false;
+    }
+    
+    if (newName.length > 50) {
+      setNameError('Name must be 50 characters or less');
+      return false;
+    }
+    
+    // Only letters, numbers, dots, and underscores
+    const nameRegex = /^[a-zA-Z0-9._]+$/;
+    if (!nameRegex.test(newName)) {
+      setNameError('Only letters, numbers, dots (.) and underscores (_) allowed');
+      return false;
+    }
+    
+    setNameError(null);
+    return true;
+  };
+
+  const handleSaveName = async () => {
+    if (!validateName(editedName)) {
+      return;
+    }
+
+    setIsSavingName(true);
+    setNameError(null);
+
+    try {
+      const token = localStorage.getItem('onlyprinters_auth_token');
+      if (!token) {
+        setNameError('Authentication required');
+        return;
+      }
+
+      const response = await fetch('/api/users/update-name', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: editedName.trim() }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setIsEditingName(false);
+        setRecalcMessage('✅ Name updated successfully!');
+        // Update changes remaining
+        if (result.data?.changesRemaining !== undefined) {
+          setChangesRemaining(result.data.changesRemaining);
+        }
+        // Refresh user context
+        await refreshUser();
+        // Refresh parent component data
+        if (onStatsUpdated) {
+          onStatsUpdated();
+        }
+        setTimeout(() => {
+          setRecalcMessage(null);
+        }, 3000);
+      } else {
+        setNameError(result.error || 'Failed to update name');
+      }
+    } catch (error) {
+      console.error('Error updating name:', error);
+      setNameError('Network error. Please try again.');
+    } finally {
+      setIsSavingName(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditedName(name);
+    setIsEditingName(false);
+    setNameError(null);
+  };
+
+  const handleStartEdit = async () => {
+    setIsEditingName(true);
+    
+    // Fetch remaining changes
+    try {
+      const token = localStorage.getItem('onlyprinters_auth_token');
+      if (!token) return;
+
+      const response = await fetch('/api/users/name-changes-remaining', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        setChangesRemaining(result.data.changesRemaining);
+      }
+    } catch (error) {
+      console.error('Error fetching name changes:', error);
+    }
+  };
 
   const handleRecalculate = async () => {
     setIsRecalculating(true);
@@ -126,10 +240,72 @@ export default function PlayerCard({
           </div>
         </div>
 
-        {/* Name */}
-        <h2 className="text-xl font-bold text-gray-900 mb-1">
-          {name}
-        </h2>
+        {/* Name with Edit Button */}
+        {isEditingName ? (
+          <div className="mb-2">
+            <input
+              type="text"
+              value={editedName}
+              onChange={(e) => {
+                setEditedName(e.target.value);
+                validateName(e.target.value);
+              }}
+              className={`w-full px-3 py-2 text-center text-lg font-bold border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                nameError ? 'border-red-400' : 'border-gray-300'
+              }`}
+              maxLength={50}
+              disabled={isSavingName}
+            />
+            {nameError && (
+              <p className="text-xs text-red-600 mt-1">{nameError}</p>
+            )}
+            {changesRemaining !== null && changesRemaining >= 0 && (
+              <p className="text-xs text-gray-600 mt-1">
+                {changesRemaining === 0 
+                  ? '⚠️ No changes remaining (2/2 used in 24h)' 
+                  : `${changesRemaining} change${changesRemaining !== 1 ? 's' : ''} remaining today`}
+              </p>
+            )}
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={handleSaveName}
+                disabled={isSavingName || !!nameError}
+                className="flex-1 px-3 py-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white text-sm font-semibold rounded-lg transition-colors"
+              >
+                {isSavingName ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                disabled={isSavingName}
+                className="flex-1 px-3 py-1 bg-gray-400 hover:bg-gray-500 disabled:bg-gray-300 text-white text-sm font-semibold rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-2">
+            <h2 className="text-xl font-bold text-gray-900 inline-block">
+              {name}
+            </h2>
+            <button
+              onClick={handleStartEdit}
+              className="ml-2 text-gray-500 hover:text-green-600 transition-colors"
+              title="Edit name (2 changes per 24h)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </button>
+            {changesRemaining !== null && changesRemaining >= 0 && (
+              <p className="text-xs text-gray-500 mt-1">
+                {changesRemaining === 0 
+                  ? 'Name change limit reached (2/2)' 
+                  : `${changesRemaining}/2 changes remaining today`}
+              </p>
+            )}
+          </div>
+        )}
         
         {/* Token Balance */}
         <p className="text-sm text-gray-600 mb-4">

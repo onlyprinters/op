@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         id: (trader._id as { toString: () => string }).toString(),
         rank: index + 1,
         name: user?.name || 'Unknown',
-        avatar: user?.avatar || '/avatars/1.png',
+        avatar: user?.avatar || '/1.png',
         wallet: user?.wallet || String(trader.wallet || ''),
         walletOriginal: user?.walletOriginal || user?.wallet || String(trader.wallet || ''),
         

@@ -68,11 +68,19 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       console.log(`📝 Creating anonymous user for wallet: ${wallet}`);
+      
+      // Generate random avatar from 1.png to 20.png (same as default in User model)
+      const randomNum = Math.floor(Math.random() * 20) + 1;
+      const avatar = `/${randomNum}.png`;
+      
+      // Use first 4 characters of wallet as name (same logic as wallet connect)
+      const shortWallet = wallet.substring(0, 4);
+      
       user = await User.create({
         wallet: walletLowercase,
         walletOriginal: wallet,
-        name: `Trader ${wallet.substring(0, 4)}...${wallet.substring(wallet.length - 4)}`,
-        avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${wallet}`,
+        name: shortWallet,
+        avatar: avatar,
       });
       console.log(`✅ Anonymous user created with ID: ${user._id}`);
     }
