@@ -19,19 +19,36 @@ export async function GET(request: NextRequest) {
 
     console.log('Fetching daily traders for season:', seasonId);
     await User.init();
-    // Get all daily traders for this season
+    
+    // Use aggregation for proper compound sorting
     // Sort: soldPrint=false first (ranked by PNL), then soldPrint=true (disqualified, at bottom)
-    const dailyTraders = await DailyTrader.find({
-      seasonId: seasonId,
-      isActive: true,
-    })
-      .populate('userId', 'name avatar wallet walletOriginal')
-      .sort({ 
-        soldPrint: 1,        // false (0) before true (1) - valid traders first
-        realizedUsdPnl: -1   // Then sort by PNL descending
-      })
-      .limit(limit)
-      .lean();
+    const dailyTraders = await DailyTrader.aggregate([
+      {
+        $match: {
+          seasonId: seasonId,
+          isActive: true,
+        }
+      },
+      {
+        $addFields: {
+          // Convert boolean to number for reliable sorting (0 = valid, 1 = disqualified)
+          sortPriority: { $cond: [{ $eq: ['$soldPrint', true] }, 1, 0] }
+        }
+      },
+      {
+        $sort: {
+          sortPriority: 1,      // Valid traders (0) before disqualified (1)
+          realizedUsdPnl: -1    // Then by PNL descending
+        }
+      },
+      { $limit: limit }
+    ]);
+
+    // Populate user data manually after aggregation
+    await DailyTrader.populate(dailyTraders, {
+      path: 'userId',
+      select: 'name avatar wallet walletOriginal'
+    });
 
     console.log(`Found ${dailyTraders.length} daily traders`);
 
