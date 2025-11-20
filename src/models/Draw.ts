@@ -64,7 +64,7 @@ const DrawParticipantSchema = new Schema<IDrawParticipant>({
   winChance: {
     type: Number,
     required: true,
-    enum: [40, 35, 25],
+    enum: [55, 30, 15],
   },
 }, { _id: false });
 
