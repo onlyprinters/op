@@ -8,6 +8,7 @@ import {
 } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import {
   WalletModalProvider,
 } from '@solana/wallet-adapter-react-ui';
@@ -133,6 +134,7 @@ export function WalletContextProvider({ children }: WalletContextProviderProps) 
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [network]
